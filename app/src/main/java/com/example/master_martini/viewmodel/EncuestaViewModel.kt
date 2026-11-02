@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 enum class CampoEncuesta { INTERESES, FORMATO, NIVEL }
 
@@ -81,6 +82,7 @@ class EncuestaViewModel(private val repositorio: MasterMartiniRepository) : View
 
         viewModelScope.launch {
             _estado.update { it.copy(guardando = true) }
+            delay(CARGA_MINIMA_MS) // deja ver la animación de guardado
             repositorio.guardarIntereses(u.id, actual.intereses)
             val actualizado = u.copy(
                 formatoPreferido = actual.formatoPreferido,
