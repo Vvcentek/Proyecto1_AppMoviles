@@ -93,13 +93,16 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Conexión HTTP con el microservicio y la API externa
+
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-    // Carga de imágenes desde internet
-    implementation(libs.coil.compose)
+    // Conexión HTTP con el microservicio y la API externa
 
-    // Tests unitarios de ViewModels y repositorios
+    implementation(libs.coil.compose)
+    // Carga de imágenes desde internet
+
+
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
+    // Tests unitarios de ViewModels y repositorios
 }
