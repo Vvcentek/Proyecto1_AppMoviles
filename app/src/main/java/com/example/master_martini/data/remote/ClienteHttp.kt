@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 // (En el emulador también funciona con adb reverse; sin él sería 10.0.2.2.)
 object ClienteHttp {
 
-    const val URL_MICROSERVICIO = "http://127.0.0.1:8080/"
+    const val URL_MICROSERVICIO = "http://10.0.2.2:8080/"
     const val URL_THEMEALDB = "https://www.themealdb.com/"
 
     val eventosApi: EventosApi by lazy { crear(URL_MICROSERVICIO).create(EventosApi::class.java) }
