@@ -14,3 +14,7 @@
 .cxx
 local.properties
 .kotlin/
+
+# Backend Spring Boot
+backend/target/
+backend/data/
