@@ -1,8 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+}
+
+// Datos de la firma del APK (keystore/keystore.properties).
+val propiedadesFirma = Properties().apply {
+    val archivo = rootProject.file("keystore/keystore.properties")
+    if (archivo.exists()) archivo.inputStream().use { load(it) }
 }
 
 android {
@@ -19,8 +27,25 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            if (propiedadesFirma.isNotEmpty()) {
+                storeFile = rootProject.file(propiedadesFirma.getProperty("storeFile"))
+                storePassword = propiedadesFirma.getProperty("storePassword")
+                keyAlias = propiedadesFirma.getProperty("keyAlias")
+                keyPassword = propiedadesFirma.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            // Genera el reporte de cobertura de los tests unitarios:
+            // ./gradlew createDebugUnitTestCoverageReport
+            enableUnitTestCoverage = true
+        }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -37,6 +62,10 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    testOptions {
+        // Las clases de Android devuelven valores por defecto en los tests de JVM.
+        unitTests.isReturnDefaultValues = true
     }
 }
 
@@ -63,4 +92,14 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // Conexión HTTP con el microservicio y la API externa
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    // Carga de imágenes desde internet
+    implementation(libs.coil.compose)
+
+    // Tests unitarios de ViewModels y repositorios
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

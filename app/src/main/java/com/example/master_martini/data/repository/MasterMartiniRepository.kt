@@ -40,9 +40,8 @@ class MasterMartiniRepository(
         interesDao.reemplazar(usuarioId, categorias.map { InteresUsuario(usuarioId, it) })
 
     // --- Contenidos ---
-    fun contenidos(categoria: Categoria? = null): Flow<List<Contenido>> =
-        if (categoria == null) contenidoDao.observarTodos()
-        else contenidoDao.observarPorCategoria(categoria)
+    // El filtro por categoría se hace en memoria en CatalogoViewModel.
+    fun contenidos(): Flow<List<Contenido>> = contenidoDao.observarTodos()
 
     fun contenido(id: Long): Flow<Contenido?> = contenidoDao.observarPorId(id)
 
