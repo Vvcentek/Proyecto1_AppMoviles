@@ -23,6 +23,9 @@ object AppViewModelProvider {
         initializer { DetalleViewModel(createSavedStateHandle(), app().repositorio) }
         initializer { FavoritosViewModel(app().repositorio) }
         initializer { PerfilViewModel(app().repositorio, AlmacenFotos(app())) }
+        initializer { EventosViewModel(app().eventosRepositorio) }
+        initializer { EventoFormViewModel(createSavedStateHandle(), app().eventosRepositorio) }
+        initializer { InspiracionViewModel(app().recetasRepositorio) }
     }
 }
 

@@ -88,4 +88,72 @@ object Validadores {
 
     fun intereses(seleccionadas: Set<*>): String? =
         if (seleccionadas.isEmpty()) "Elige al menos una especialidad" else null
+
+    // ---------- Eventos (CRUD con el microservicio) ----------
+
+    fun tituloEvento(valor: String): String? {
+        val texto = valor.trim()
+        return when {
+            texto.isEmpty() -> "Ingresa el título del evento"
+            texto.length < 5 -> "Debe tener al menos 5 caracteres"
+            texto.length > 80 -> "Máximo 80 caracteres"
+            else -> null
+        }
+    }
+
+    fun descripcionEvento(valor: String): String? {
+        val texto = valor.trim()
+        return when {
+            texto.isEmpty() -> "Ingresa una descripción"
+            texto.length < 10 -> "Debe tener al menos 10 caracteres"
+            texto.length > 300 -> "Máximo 300 caracteres"
+            else -> null
+        }
+    }
+
+    fun lugarEvento(valor: String): String? {
+        val texto = valor.trim()
+        return when {
+            texto.isEmpty() -> "Ingresa el lugar"
+            texto.length < 5 -> "El lugar es muy corto"
+            texto.length > 120 -> "Máximo 120 caracteres"
+            else -> null
+        }
+    }
+
+    fun cuposEvento(valor: String): String? {
+        val numero = valor.trim().toIntOrNull()
+        return when {
+            valor.isBlank() -> "Ingresa los cupos"
+            numero == null -> "Usa solo números"
+            numero < 1 -> "Debe haber al menos 1 cupo"
+            numero > 500 -> "Máximo 500 cupos"
+            else -> null
+        }
+    }
+
+    private val REGEX_FECHA = Regex("^(\\d{4})-(\\d{2})-(\\d{2})$")
+
+    // Fecha en formato AAAA-MM-DD, que exista en el calendario y no esté en el pasado.
+    // "hoy" se puede pasar desde los tests para que no dependan del día en que se ejecutan.
+    fun fechaEvento(valor: String, hoy: String = hoyIso()): String? {
+        val texto = valor.trim()
+        if (texto.isEmpty()) return "Ingresa la fecha"
+        val partes = REGEX_FECHA.matchEntire(texto) ?: return "Usa el formato AAAA-MM-DD, por ejemplo: 2026-12-15"
+        val (anio, mes, dia) = partes.destructured.toList().map { it.toInt() }
+        if (mes !in 1..12) return "El mes debe estar entre 01 y 12"
+        if (dia !in 1..diasDelMes(anio, mes)) return "Ese día no existe en el mes indicado"
+        // Con el formato AAAA-MM-DD, comparar textos equivale a comparar fechas.
+        if (texto < hoy) return "La fecha no puede estar en el pasado"
+        return null
+    }
+
+    fun diasDelMes(anio: Int, mes: Int): Int = when (mes) {
+        2 -> if ((anio % 4 == 0 && anio % 100 != 0) || anio % 400 == 0) 29 else 28
+        4, 6, 9, 11 -> 30
+        else -> 31
+    }
+
+    fun hoyIso(): String =
+        java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
 }

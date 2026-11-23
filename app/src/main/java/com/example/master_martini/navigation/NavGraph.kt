@@ -10,10 +10,14 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
@@ -38,10 +42,14 @@ import com.example.master_martini.ui.screens.BienvenidaScreen
 import com.example.master_martini.ui.screens.CatalogoScreen
 import com.example.master_martini.ui.screens.DetalleScreen
 import com.example.master_martini.ui.screens.EncuestaScreen
+import com.example.master_martini.ui.screens.EventoFormScreen
+import com.example.master_martini.ui.screens.EventosScreen
+import com.example.master_martini.ui.screens.InspiracionScreen
 import com.example.master_martini.ui.screens.FavoritosScreen
 import com.example.master_martini.ui.screens.PerfilScreen
 import com.example.master_martini.ui.screens.RegistroScreen
 import com.example.master_martini.viewmodel.DetalleViewModel
+import com.example.master_martini.viewmodel.EventoFormViewModel
 
 object Rutas {
     const val BIENVENIDA = "bienvenida"
@@ -53,6 +61,10 @@ object Rutas {
     const val PERFIL = "perfil"
     const val DETALLE = "detalle/{contenidoId}"
     fun detalle(id: Long) = "detalle/$id"
+    const val EVENTOS = "eventos"
+    const val INSPIRACION = "inspiracion"
+    const val EVENTO_FORM = "evento_form/{eventoId}"
+    fun eventoForm(id: Long = EventoFormViewModel.NUEVO) = "evento_form/$id"
 }
 
 private data class Seccion(
@@ -65,6 +77,8 @@ private data class Seccion(
 // Secciones del menú inferior.
 private val secciones = listOf(
     Seccion(Rutas.CATALOGO, "Contenidos", Icons.Outlined.Home, Icons.Filled.Home),
+    Seccion(Rutas.EVENTOS, "Eventos", Icons.Outlined.Event, Icons.Filled.Event),
+    Seccion(Rutas.INSPIRACION, "Ideas", Icons.Outlined.Lightbulb, Icons.Filled.Lightbulb),
     Seccion(Rutas.FAVORITOS, "Favoritos", Icons.Outlined.FavoriteBorder, Icons.Filled.Favorite),
     Seccion(Rutas.PERFIL, "Perfil", Icons.Outlined.Person, Icons.Filled.Person)
 )
@@ -148,7 +162,7 @@ fun MasterMartiniNavHost(navController: NavHostController = rememberNavControlle
                     }
                 )
             }
-            // Las tres secciones del menú cambian con un fundido suave.
+            // Las secciones del menú cambian con un fundido suave.
             composable(Rutas.CATALOGO, enterTransition = { fadeIn(tween(DURACION)) }, exitTransition = { fadeOut(tween(DURACION)) }) {
                 CatalogoScreen(onAbrirContenido = { id -> navController.navigate(Rutas.detalle(id)) })
             }
@@ -160,6 +174,21 @@ fun MasterMartiniNavHost(navController: NavHostController = rememberNavControlle
             }
             composable(Rutas.PERFIL, enterTransition = { fadeIn(tween(DURACION)) }, exitTransition = { fadeOut(tween(DURACION)) }) {
                 PerfilScreen(onEditarIntereses = { navController.navigate(Rutas.EDITAR_INTERESES) })
+            }
+            composable(Rutas.EVENTOS, enterTransition = { fadeIn(tween(DURACION)) }, exitTransition = { fadeOut(tween(DURACION)) }) {
+                EventosScreen(
+                    onNuevo = { navController.navigate(Rutas.eventoForm()) },
+                    onEditar = { id -> navController.navigate(Rutas.eventoForm(id)) }
+                )
+            }
+            composable(Rutas.INSPIRACION, enterTransition = { fadeIn(tween(DURACION)) }, exitTransition = { fadeOut(tween(DURACION)) }) {
+                InspiracionScreen()
+            }
+            composable(
+                route = Rutas.EVENTO_FORM,
+                arguments = listOf(navArgument(EventoFormViewModel.ARG_ID) { type = NavType.LongType })
+            ) {
+                EventoFormScreen(onVolver = { navController.popBackStack() })
             }
             composable(
                 route = Rutas.DETALLE,
@@ -191,7 +220,7 @@ private fun MenuInferior(rutaActual: String?, onNavegar: (String) -> Unit) {
                         contentDescription = null
                     )
                 },
-                label = { Text(seccion.etiqueta, style = MaterialTheme.typography.labelLarge) },
+                label = { Text(seccion.etiqueta, style = MaterialTheme.typography.labelMedium, maxLines = 1) },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.primaryContainer,
                     selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
